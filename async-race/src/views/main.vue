@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import ControlForm from "./components/ControlForm.vue";
+import RacesControlForm from "../components/RacesControlForm.vue";
+import Races from "../components/Races.vue";
 </script>
 
 <template>
@@ -7,7 +8,8 @@ import ControlForm from "./components/ControlForm.vue";
     <button></button>
     <button></button>
   </nav>
-  <ControlForm />
+  <RacesControlForm />
+  <Races />
 </template>
 
 <stype scoped></stype>
