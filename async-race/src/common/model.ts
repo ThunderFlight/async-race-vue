@@ -1,4 +1,4 @@
-export default interface Car {
+export interface Car {
   name: string;
   color: string;
   id: number;

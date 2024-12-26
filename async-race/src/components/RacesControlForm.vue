@@ -1,23 +1,51 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from "vue";
+import { useGarageStore } from "../store/store.ts";
+
+const store = useGarageStore();
+const createCarText = ref<string>("");
+const createCarColor = ref<string>("");
+</script>
 
 <template>
-  <form action="">
-    <div>
+  <div class="forms-wrapper">
+    <div class="races-control">
       <button>race</button>
       <button>restart</button>
     </div>
-    <div>
-      <input type="text" placeholder="type car brand" />
-      <input type="color" />
-      <button>create</button>
+    <div class="create-car-wrapper">
+      <input type="text" placeholder="type car brand" v-model="createCarText" />
+      <input type="color" v-model="createCarColor" />
+      <button @click.prevent="store.createCar(createCarText, createCarColor)">
+        create
+      </button>
     </div>
-    <div>
+    <div class="udpate-car-wrapper">
       <input type="text" placeholder="type car brand" />
       <input type="color" />
       <button>update</button>
     </div>
     <button>generate cars</button>
-  </form>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.forms-wrapper {
+  display: flex;
+
+  .races-control {
+    display: flex;
+    align-items: center;
+  }
+
+  .create-car-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .udpate-car-wrapper {
+    display: flex;
+    align-items: center;
+  }
+}
+</style>

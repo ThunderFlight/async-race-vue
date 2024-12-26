@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import Race from "./Race.vue";
-import * as raceData from "../services/RaceData/race-data.ts";
-const { data, error } = raceData.getCars();
+import { useGarageStore } from "../store/store.ts";
+import { storeToRefs } from "pinia";
+
+const store = useGarageStore();
+store.getCars();
+
+const { getGarage } = storeToRefs(store);
 </script>
 
 <template>
-  <div v-for="(item, key) in data" :key="key">
-    <Race :car="item" />
+  <div v-for="car in getGarage">
+    <Race :car="car" />
   </div>
 </template>
 
