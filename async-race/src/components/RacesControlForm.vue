@@ -5,6 +5,8 @@ import { useGarageStore } from "../store/store.ts";
 const store = useGarageStore();
 const createCarText = ref<string>("");
 const createCarColor = ref<string>("");
+const updateCarText = ref<string>("");
+const updateCarColor = ref<string>("");
 </script>
 
 <template>
@@ -21,9 +23,11 @@ const createCarColor = ref<string>("");
       </button>
     </div>
     <div class="udpate-car-wrapper">
-      <input type="text" placeholder="type car brand" />
-      <input type="color" />
-      <button>update</button>
+      <input type="text" placeholder="type car brand" v-model="updateCarText" />
+      <input type="color" v-model="updateCarColor" />
+      <button @click.prevent="store.updateCar(updateCarText, updateCarColor)">
+        update
+      </button>
     </div>
     <button>generate cars</button>
   </div>

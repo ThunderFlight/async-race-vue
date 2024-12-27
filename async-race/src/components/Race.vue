@@ -2,14 +2,22 @@
 import type { Car } from "../common/model.ts";
 
 const props = defineProps<{ car: Car }>();
+const emit = defineEmits<{
+  (e: "deleteCar"): void;
+  (e: "selectCar"): void;
+}>();
 </script>
 
 <template>
   <div class="race-wrapper">
     <div class="car-control">
       <div class="car-customization">
-        <button class="select-car">select</button>
-        <button class="remove-car">remove</button>
+        <button class="select-car" @click.permit="emit('selectCar')">
+          select
+        </button>
+        <button class="remove-car" @click.permit="emit('deleteCar')">
+          remove
+        </button>
       </div>
       <div class="car-race-cntrol">
         <button class="start">a</button>

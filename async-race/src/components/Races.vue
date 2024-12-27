@@ -11,7 +11,11 @@ const { getGarage } = storeToRefs(store);
 
 <template>
   <div v-for="car in getGarage">
-    <Race :car="car" />
+    <Race
+      :car="car"
+      @select-car="store.selectCar(car.id)"
+      @delete-car="store.deleteCar(car.id)"
+    />
   </div>
 </template>
 
