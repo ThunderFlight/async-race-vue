@@ -77,3 +77,14 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@keyframes drive {
+  from {
+    left: 0px;
+    transform: translateX(0);
+  }
+  to {
+    left: 100%;
+    transform: translateX(-100%);
+  }
+}

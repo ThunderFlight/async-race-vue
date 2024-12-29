@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useGarageStore } from "../store/store.ts";
+import { useGarageStore } from "../store/garageStore.ts";
 
 const store = useGarageStore();
 const createCarText = ref<string>("");

@@ -56,6 +56,10 @@ export const useGarageStore = defineStore("garage", {
     },
 
     updateCar(name: string, color: string) {
+      if (this.selectedCarId === null) {
+        return;
+      }
+
       const dataParams = { name, color };
       const requestParams = {
         method: "PUT",

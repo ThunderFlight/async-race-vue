@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import Race from "./Race.vue";
-import { useGarageStore } from "../store/store.ts";
+import { useGarageStore } from "../store/garageStore.ts";
 import { storeToRefs } from "pinia";
 
-const store = useGarageStore();
-store.getCars();
+const garageStore = useGarageStore();
+garageStore.getCars();
 
-const { getGarage } = storeToRefs(store);
+const { getGarage } = storeToRefs(garageStore);
 </script>
 
 <template>
   <div v-for="car in getGarage">
-    <Race
-      :car="car"
-      @select-car="store.selectCar(car.id)"
-      @delete-car="store.deleteCar(car.id)"
-    />
+    <Race :car="car" />
   </div>
 </template>
 

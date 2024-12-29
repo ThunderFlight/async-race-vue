@@ -4,11 +4,11 @@ export interface Car {
   id: number;
 }
 
-export default interface Engine {
+export interface Engine {
   velocity: number;
   distance: number;
 }
 
-export default interface Drive {
+export interface Drive {
   success: boolean;
 }
