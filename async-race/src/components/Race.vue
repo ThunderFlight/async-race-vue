@@ -3,21 +3,46 @@ import { useGarageStore } from "../store/garageStore.ts";
 import type { Car } from "../common/model.ts";
 import { ref } from "vue";
 
+interface Animation {
+  animation: string;
+  animationPlayState: string;
+  backgroundColor: string;
+}
+
 const props = defineProps<{ car: Car }>();
 const garageStore = useGarageStore();
 const requestParams = { method: "PATCH" };
-const carRaceTime = ref<number>(0);
-const setAnimation = ref<string>("");
+const carStyles = ref<Animation>({
+  animation: `0s`,
+  animationPlayState: "running",
+  backgroundColor: `${props.car.color}`,
+});
 
-async function startEngine(id: number) {
-  await fetch(
-    `http://127.0.0.1:3000/engine?id=${id}&status=started`,
-    requestParams,
-  )
+function startEngine(id: number) {
+  fetch(`http://127.0.0.1:3000/engine?id=${id}&status=started`, requestParams)
     .then((res) => res.json())
     .then((json) => {
-      carRaceTime.value = json.distance / json.velocity;
-      setAnimation.value = "drive";
+      carStyles.value.animation = `drive ${json.distance / json.velocity}ms
+      forwards`;
+      carStyles.value.animationPlayState = "running";
+    });
+
+  fetch(`http://127.0.0.1:3000/engine?id=${id}&status=drive`, requestParams)
+    .then((res) => res.json())
+    .then((json) => {
+      console.log(json);
+    })
+    .catch(() => {
+      console.log("asdf");
+      carStyles.value.animationPlayState = "paused";
+    });
+}
+
+function stopEngine(id: number) {
+  fetch(`http://127.0.0.1:3000/engine?id=${id}&status=stopped`, requestParams)
+    .then((res) => res.json())
+    .then(() => {
+      carStyles.value.animation = ``;
     });
 }
 </script>
@@ -43,17 +68,11 @@ async function startEngine(id: number) {
         <button class="start" @click.permit="startEngine(props.car.id)">
           a
         </button>
-        <button class="restart">b</button>
+        <button class="stop" @click.permit="stopEngine(props.car.id)">b</button>
       </div>
     </div>
     <div class="road">
-      <div
-        class="car animated"
-        :style="{
-          'background-color': props.car.color,
-          animation: `${setAnimation} ${carRaceTime}ms forwards`,
-        }"
-      ></div>
+      <div class="car animated" :style="carStyles"></div>
     </div>
   </div>
 </template>
