@@ -64,6 +64,7 @@ function stopEngine(id: number) {
           remove
         </button>
       </div>
+
       <div class="car-race-cntrol">
         <button class="start" @click.permit="startEngine(props.car.id)">
           a
@@ -73,6 +74,7 @@ function stopEngine(id: number) {
     </div>
     <div class="road">
       <div class="car animated" :style="carStyles"></div>
+      <p>{{ props.car.name }}</p>
     </div>
   </div>
 </template>

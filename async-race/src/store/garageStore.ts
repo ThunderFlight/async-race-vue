@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { Car } from "../common/model";
+import { getCarBrand, getRandomColor } from "../common/functions";
 
 interface State {
   garage: Car[];
@@ -15,7 +16,6 @@ export const useGarageStore = defineStore("garage", {
   }),
   getters: {
     getGarage: (state) => {
-      console.log(state.garage);
       return state.garage;
     },
   },
@@ -46,12 +46,20 @@ export const useGarageStore = defineStore("garage", {
       this.garage = [...this.garage, { name, color, id: randomId }];
     },
 
+    createCars() {
+      for (let i = 0; i < 50; i++) {
+        this.createCar(getCarBrand(), getRandomColor());
+      }
+    },
+
     deleteCar(id: number) {
       const requestParams = {
         method: "DELETE",
       };
 
       fetch(baseUrl + `/${id}`, requestParams);
+      console.log(id);
+      console.log(this.garage);
       this.garage = this.garage.filter((car) => car.id !== +id);
     },
 

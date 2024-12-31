@@ -29,7 +29,7 @@ const updateCarColor = ref<string>("");
         update
       </button>
     </div>
-    <button>generate cars</button>
+    <button @click.prevent="store.createCars()">generate cars</button>
   </div>
 </template>
 
