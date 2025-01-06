@@ -1,85 +1,94 @@
 import { defineStore } from "pinia";
 import type { Car } from "../common/model";
 import { getCarBrand, getRandomColor } from "../common/functions";
+import { request } from "../utils/requests.ts";
+import { ref, watchEffect } from "vue";
 
-interface State {
-  garage: Car[];
-  selectedCarId: null | number;
-}
+export const useGarageStore = defineStore("garage", () => {
+  const garage = ref<Car[]>([]);
+  const limit = ref(7);
+  const page = ref(1);
+  const selectedCarId = ref<number | null>(null);
 
-const baseUrl = "http://127.0.0.1:3000/garage";
+  watchEffect(() => {
+    page;
+    garage;
+    getGarage();
+  });
 
-export const useGarageStore = defineStore("garage", {
-  state: (): State => ({
-    garage: [],
-    selectedCarId: null,
-  }),
-  getters: {
-    getGarage: (state) => {
-      return state.garage;
-    },
-  },
-  actions: {
-    selectCar(id: number) {
-      this.selectedCarId = id;
-    },
+  async function getGarage() {
+    const queryParams = { "X-Total-Count": `${limit}` };
+    request.options.query = JSON.stringify(queryParams);
+    await request
+      .get<Car[]>(`garage?_page=${page.value}&_limit=${limit.value}`)
+      .then((cars) => {
+        garage.value = cars;
+      });
+    return garage;
+  }
 
-    getCars() {
-      const requestParams = { method: "GET" };
+  function nextPage() {
+    page.value += 1;
+  }
 
-      fetch(baseUrl, requestParams)
-        .then((res) => res.json())
-        .then((json) => (this.garage = json));
-    },
+  function previousPage() {
+    if (!page.value) {
+      return;
+    }
+    page.value -= 1;
+  }
 
-    createCar(name: string, color: string) {
-      const dataParams = { name, color };
-      const requestParams = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataParams),
-      };
-      fetch(baseUrl, requestParams).then((res) => res.json());
+  function selectCar(id: number) {
+    selectedCarId.value = id;
+  }
 
-      const randomId = Math.floor(Math.random() * 9999);
+  async function createCar(name: string, color: string) {
+    const dataParams = { name, color };
 
-      this.garage = [...this.garage, { name, color, id: randomId }];
-    },
+    request.options.body = JSON.stringify(dataParams);
+    await request.post("garage");
+    //const randomId = Math.floor(Math.random() * 9999);
+    //this.garage = [...this.garage, { name, color, id: randomId }];
+  }
 
-    createCars() {
-      for (let i = 0; i < 50; i++) {
-        this.createCar(getCarBrand(), getRandomColor());
-      }
-    },
+  function createCars() {
+    for (let i = 0; i < 50; i++) {
+      createCar(getCarBrand(), getRandomColor());
+    }
+  }
 
-    deleteCar(id: number) {
-      const requestParams = {
-        method: "DELETE",
-      };
+  async function deleteCar(id: number) {
+    await request.delete(`garage/${id}`);
+    //this.garage = this.garage.filter((car) => car.id !== +id);
+  }
 
-      fetch(baseUrl + `/${id}`, requestParams);
-      console.log(id);
-      console.log(this.garage);
-      this.garage = this.garage.filter((car) => car.id !== +id);
-    },
+  async function updateCar(name: string, color: string) {
+    if (selectedCarId.value === null) {
+      return;
+    }
 
-    updateCar(name: string, color: string) {
-      if (this.selectedCarId === null) {
-        return;
-      }
+    const dataParams = { name, color };
 
-      const dataParams = { name, color };
-      const requestParams = {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataParams),
-      };
-      fetch(baseUrl + `/${this.selectedCarId}`, requestParams)
-        .then((res) => res.json())
-        .then((json) => {
-          const index = this.garage.findIndex((car) => car.id === json.id);
-          this.garage.splice(index, 1, json);
-        });
-    },
-  },
+    request.options.headers = { "Content-Type": "application/json" };
+    request.options.body = JSON.stringify(dataParams);
+
+    await request.put<Car>(`/${selectedCarId.value}`);
+
+    //const index = this.garage.findIndex((car) => car.id === updatedCar.id);
+    //this.garage.splice(index, 1, updatedCar);
+  }
+
+  return {
+    garage,
+    page,
+    selectedCarId,
+    selectCar,
+    getGarage,
+    createCar,
+    deleteCar,
+    updateCar,
+    createCars,
+    nextPage,
+    previousPage,
+  };
 });

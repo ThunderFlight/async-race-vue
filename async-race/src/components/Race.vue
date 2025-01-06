@@ -6,7 +6,7 @@ import { ref } from "vue";
 interface Animation {
   animation: string;
   animationPlayState: string;
-  backgroundColor: string;
+  backgroundColor?: string;
 }
 
 const props = defineProps<{ car: Car }>();

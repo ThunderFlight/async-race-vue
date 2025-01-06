@@ -4,10 +4,6 @@ import Races from "../components/Races.vue";
 </script>
 
 <template>
-  <nav>
-    <button></button>
-    <button></button>
-  </nav>
   <RacesControlForm />
   <Races />
 </template>
