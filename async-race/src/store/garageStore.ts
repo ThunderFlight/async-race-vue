@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Car } from "../common/model";
+import type { Car, Drive, DriveOptions, Engine } from "../common/model";
 import { getCarBrand, getRandomColor } from "../common/functions";
 import { request } from "../utils/requests.ts";
 import { ref, watchEffect } from "vue";
@@ -9,6 +9,7 @@ export const useGarageStore = defineStore("garage", () => {
   const limit = ref(7);
   const page = ref(1);
   const selectedCarId = ref<number | null>(null);
+  const driveOptions = ref<DriveOptions[]>([]);
 
   watchEffect(() => {
     page;
@@ -16,9 +17,43 @@ export const useGarageStore = defineStore("garage", () => {
     getGarage();
   });
 
+  function startAllEngines() {
+    garage.value.forEach((car) => startEngine(car.id));
+  }
+
+  function stopAllEngines() {
+    garage.value.forEach((car) => stopEngine(car.id));
+  }
+
+  async function startEngine(id: number) {
+    await request
+      .patch<Engine>(`engine?id=${id}&status=started`)
+      .then((engine) => {
+        const time = engine.distance / engine.velocity;
+        const driveStatus = true;
+        const resetStatus = false;
+        console.log(resetStatus);
+        driveOptions.value = [
+          ...driveOptions.value,
+          { time, driveStatus, resetStatus, id },
+        ];
+      });
+
+    await request.patch<Drive>(`engine?id=${id}&status=drive`).catch(() => {
+      const findedCar = driveOptions.value.findIndex((car) => car.id === id);
+      driveOptions.value[findedCar].driveStatus = false;
+    });
+  }
+
+  async function stopEngine(id: number) {
+    await request.patch(`engine?id=${id}&status=stopped`).catch(() => {
+      const findedCar = driveOptions.value.findIndex((car) => car.id === id);
+      driveOptions.value[findedCar].resetStatus = true;
+      console.log("asdf");
+    });
+  }
+
   async function getGarage() {
-    const queryParams = { "X-Total-Count": `${limit}` };
-    request.options.query = JSON.stringify(queryParams);
     await request
       .get<Car[]>(`garage?_page=${page.value}&_limit=${limit.value}`)
       .then((cars) => {
@@ -47,8 +82,6 @@ export const useGarageStore = defineStore("garage", () => {
 
     request.options.body = JSON.stringify(dataParams);
     await request.post("garage");
-    //const randomId = Math.floor(Math.random() * 9999);
-    //this.garage = [...this.garage, { name, color, id: randomId }];
   }
 
   function createCars() {
@@ -59,7 +92,6 @@ export const useGarageStore = defineStore("garage", () => {
 
   async function deleteCar(id: number) {
     await request.delete(`garage/${id}`);
-    //this.garage = this.garage.filter((car) => car.id !== +id);
   }
 
   async function updateCar(name: string, color: string) {
@@ -73,15 +105,13 @@ export const useGarageStore = defineStore("garage", () => {
     request.options.body = JSON.stringify(dataParams);
 
     await request.put<Car>(`/${selectedCarId.value}`);
-
-    //const index = this.garage.findIndex((car) => car.id === updatedCar.id);
-    //this.garage.splice(index, 1, updatedCar);
   }
 
   return {
     garage,
     page,
     selectedCarId,
+    driveOptions,
     selectCar,
     getGarage,
     createCar,
@@ -90,5 +120,9 @@ export const useGarageStore = defineStore("garage", () => {
     createCars,
     nextPage,
     previousPage,
+    startEngine,
+    stopEngine,
+    startAllEngines,
+    stopAllEngines,
   };
 });

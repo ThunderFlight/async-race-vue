@@ -12,3 +12,10 @@ export interface Engine {
 export interface Drive {
   success: boolean;
 }
+
+export interface DriveOptions {
+  time: number;
+  driveStatus: boolean;
+  resetStatus: boolean;
+  id: number;
+}

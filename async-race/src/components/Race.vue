@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useGarageStore } from "../store/garageStore.ts";
+import { storeToRefs } from "pinia";
 import type { Car } from "../common/model.ts";
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 
 interface Animation {
   animation: string;
@@ -11,40 +12,32 @@ interface Animation {
 
 const props = defineProps<{ car: Car }>();
 const garageStore = useGarageStore();
-const requestParams = { method: "PATCH" };
+const { driveOptions } = storeToRefs(garageStore);
 const carStyles = ref<Animation>({
   animation: `0s`,
   animationPlayState: "running",
   backgroundColor: `${props.car.color}`,
 });
 
-function startEngine(id: number) {
-  fetch(`http://127.0.0.1:3000/engine?id=${id}&status=started`, requestParams)
-    .then((res) => res.json())
-    .then((json) => {
-      carStyles.value.animation = `drive ${json.distance / json.velocity}ms
-      forwards`;
-      carStyles.value.animationPlayState = "running";
-    });
+watchEffect(() => {
+  driveOptions;
+  const driveOption = garageStore.driveOptions.find(
+    (options) => options.id === props.car.id,
+  );
 
-  fetch(`http://127.0.0.1:3000/engine?id=${id}&status=drive`, requestParams)
-    .then((res) => res.json())
-    .then((json) => {
-      console.log(json);
-    })
-    .catch(() => {
-      console.log("asdf");
-      carStyles.value.animationPlayState = "paused";
-    });
-}
+  if (driveOption?.driveStatus) {
+    carStyles.value.animation = `drive ${driveOption?.time}ms forwards`;
+    carStyles.value.animationPlayState = "running";
+  } else {
+    carStyles.value.animationPlayState = "paused";
+  }
 
-function stopEngine(id: number) {
-  fetch(`http://127.0.0.1:3000/engine?id=${id}&status=stopped`, requestParams)
-    .then((res) => res.json())
-    .then(() => {
-      carStyles.value.animation = ``;
-    });
-}
+  console.log(driveOption?.resetStatus);
+  if (driveOption?.resetStatus) {
+    carStyles.value.animation = "";
+    console.log(driveOption.resetStatus);
+  }
+});
 </script>
 
 <template>
@@ -66,10 +59,18 @@ function stopEngine(id: number) {
       </div>
 
       <div class="car-race-cntrol">
-        <button class="start" @click.permit="startEngine(props.car.id)">
+        <button
+          class="start"
+          @click.permit="garageStore.startEngine(props.car.id)"
+        >
           a
         </button>
-        <button class="stop" @click.permit="stopEngine(props.car.id)">b</button>
+        <button
+          class="stop"
+          @click.permit="garageStore.stopEngine(props.car.id)"
+        >
+          b
+        </button>
       </div>
     </div>
     <div class="road">

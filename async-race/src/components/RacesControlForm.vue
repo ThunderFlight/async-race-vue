@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useGarageStore } from "../store/garageStore.ts";
 
-const store = useGarageStore();
+const garageStore = useGarageStore();
 const createCarText = ref<string>("");
 const createCarColor = ref<string>("");
 const updateCarText = ref<string>("");
@@ -12,24 +12,28 @@ const updateCarColor = ref<string>("");
 <template>
   <div class="forms-wrapper">
     <div class="races-control">
-      <button>race</button>
-      <button>restart</button>
+      <button @click.prevent="garageStore.startAllEngines()">race</button>
+      <button @click.permit="garageStore.stopAllEngines()">restart</button>
     </div>
     <div class="create-car-wrapper">
       <input type="text" placeholder="type car brand" v-model="createCarText" />
       <input type="color" v-model="createCarColor" />
-      <button @click.prevent="store.createCar(createCarText, createCarColor)">
+      <button
+        @click.prevent="garageStore.createCar(createCarText, createCarColor)"
+      >
         create
       </button>
     </div>
     <div class="udpate-car-wrapper">
       <input type="text" placeholder="type car brand" v-model="updateCarText" />
       <input type="color" v-model="updateCarColor" />
-      <button @click.prevent="store.updateCar(updateCarText, updateCarColor)">
+      <button
+        @click.prevent="garageStore.updateCar(updateCarText, updateCarColor)"
+      >
         update
       </button>
     </div>
-    <button @click.prevent="store.createCars()">generate cars</button>
+    <button @click.prevent="garageStore.createCars()">generate cars</button>
   </div>
 </template>
 
