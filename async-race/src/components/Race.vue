@@ -32,10 +32,8 @@ watchEffect(() => {
     carStyles.value.animationPlayState = "paused";
   }
 
-  console.log(driveOption?.resetStatus);
   if (driveOption?.resetStatus) {
     carStyles.value.animation = "";
-    console.log(driveOption.resetStatus);
   }
 });
 </script>

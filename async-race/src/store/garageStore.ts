@@ -26,13 +26,13 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   async function startEngine(id: number) {
+    driveOptions.value = [];
     await request
       .patch<Engine>(`engine?id=${id}&status=started`)
       .then((engine) => {
         const time = engine.distance / engine.velocity;
         const driveStatus = true;
         const resetStatus = false;
-        console.log(resetStatus);
         driveOptions.value = [
           ...driveOptions.value,
           { time, driveStatus, resetStatus, id },
@@ -46,10 +46,9 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   async function stopEngine(id: number) {
-    await request.patch(`engine?id=${id}&status=stopped`).catch(() => {
+    await request.patch(`engine?id=${id}&status=stopped`).then(() => {
       const findedCar = driveOptions.value.findIndex((car) => car.id === id);
       driveOptions.value[findedCar].resetStatus = true;
-      console.log("asdf");
     });
   }
 
