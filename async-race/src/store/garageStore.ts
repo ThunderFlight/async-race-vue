@@ -54,10 +54,17 @@ export const useGarageStore = defineStore("garage", () => {
         ];
       });
 
-    await request.patch<Drive>(`engine?id=${id}&status=drive`).catch(() => {
-      const findedCar = driveOptions.value.findIndex((car) => car.id === id);
-      driveOptions.value[findedCar].driveStatus = false;
-    });
+    await request
+      .patch<Drive>(`engine?id=${id}&status=drive`)
+      .catch(() => {
+        const findedCar = driveOptions.value.findIndex((car) => car.id === id);
+        driveOptions.value[findedCar].driveStatus = false;
+      })
+      .then((value) => {
+        if (value) {
+          console.log(value);
+        }
+      });
   }
 
   async function stopEngine(id: number) {

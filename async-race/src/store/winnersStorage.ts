@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { request } from "../utils/requests";
 import type { Win } from "../common/model";
 
@@ -10,10 +10,31 @@ interface UpdateWinner {
 
 export const useWinnersStore = defineStore("winners", () => {
   const winners = ref<Win[]>([]);
+  const limit = ref(7);
+  const page = ref(1);
+
+  watchEffect(() => {
+    page;
+    getWinners();
+  });
+
+  function nextPage() {
+    page.value += 1;
+  }
+
+  function previousPage() {
+    if (!page.value) {
+      return;
+    }
+    page.value -= 1;
+  }
+
   async function getWinners() {
-    await request.get<Win[]>(`winners`).then((win) => {
-      winners.value = win;
-    });
+    await request
+      .get<Win[]>(`winners?_page${page.value}$_limit=${limit.value}`)
+      .then((win) => {
+        winners.value = win;
+      });
   }
 
   async function getWinner(id: number) {
@@ -42,5 +63,7 @@ export const useWinnersStore = defineStore("winners", () => {
     createWinner,
     deleteWinner,
     updateWinner,
+    nextPage,
+    previousPage,
   };
 });
