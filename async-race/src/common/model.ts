@@ -19,3 +19,9 @@ export interface DriveOptions {
   resetStatus: boolean;
   id: number;
 }
+
+export interface Win {
+  id: number;
+  wins: number;
+  time: number;
+}
