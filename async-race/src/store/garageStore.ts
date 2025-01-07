@@ -17,6 +17,21 @@ export const useGarageStore = defineStore("garage", () => {
     getGarage();
   });
 
+  function nextPage() {
+    page.value += 1;
+  }
+
+  function previousPage() {
+    if (!page.value) {
+      return;
+    }
+    page.value -= 1;
+  }
+
+  function selectCar(id: number) {
+    selectedCarId.value = id;
+  }
+
   function startAllEngines() {
     garage.value.forEach((car) => startEngine(car.id));
   }
@@ -61,26 +76,11 @@ export const useGarageStore = defineStore("garage", () => {
     return garage;
   }
 
-  function nextPage() {
-    page.value += 1;
-  }
-
-  function previousPage() {
-    if (!page.value) {
-      return;
-    }
-    page.value -= 1;
-  }
-
-  function selectCar(id: number) {
-    selectedCarId.value = id;
-  }
-
   async function createCar(name: string, color: string) {
     const dataParams = { name, color };
 
-    request.options.body = JSON.stringify(dataParams);
-    await request.post("garage");
+    await request.post("garage", dataParams);
+    getGarage();
   }
 
   function createCars() {
@@ -91,6 +91,7 @@ export const useGarageStore = defineStore("garage", () => {
 
   async function deleteCar(id: number) {
     await request.delete(`garage/${id}`);
+    getGarage();
   }
 
   async function updateCar(name: string, color: string) {
@@ -100,10 +101,8 @@ export const useGarageStore = defineStore("garage", () => {
 
     const dataParams = { name, color };
 
-    request.options.headers = { "Content-Type": "application/json" };
-    request.options.body = JSON.stringify(dataParams);
-
-    await request.put<Car>(`/${selectedCarId.value}`);
+    await request.put<Car>(`/garage/${selectedCarId.value}`, dataParams);
+    getGarage();
   }
 
   return {

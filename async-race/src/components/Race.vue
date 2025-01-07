@@ -20,6 +20,11 @@ const carStyles = ref<Animation>({
 });
 
 watchEffect(() => {
+  props;
+  carStyles.value.backgroundColor = `${props.car.color}`;
+});
+
+watchEffect(() => {
   driveOptions;
   const driveOption = garageStore.driveOptions.find(
     (options) => options.id === props.car.id,
