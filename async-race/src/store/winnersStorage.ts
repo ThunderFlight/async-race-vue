@@ -12,6 +12,7 @@ export const useWinnersStore = defineStore("winners", () => {
   const winners = ref<Win[]>([]);
   const limit = ref(7);
   const page = ref(1);
+  const winner = ref<Win | null>(null);
 
   watchEffect(() => {
     page;
@@ -30,6 +31,7 @@ export const useWinnersStore = defineStore("winners", () => {
   }
 
   async function getWinners() {
+    winner.value = null;
     await request
       .get<Win[]>(`winners?_page${page.value}$_limit=${limit.value}`)
       .then((win) => {
@@ -38,13 +40,13 @@ export const useWinnersStore = defineStore("winners", () => {
   }
 
   async function getWinner(id: number) {
-    const response = await request.get<Win>(`winners/${id}`);
-    return response;
+    await request.get<Win>(`winners/${id}`).then((response) => {
+      winner.value = { time: response.time, wins: response.wins, id };
+    });
   }
 
   async function createWinner(newWinner: Win) {
-    request.options.body = JSON.stringify(newWinner);
-    await request.post<Win>(`winners`);
+    await request.post<Win>(`winners`, newWinner);
   }
 
   async function deleteWinner(id: number) {
@@ -52,12 +54,12 @@ export const useWinnersStore = defineStore("winners", () => {
   }
 
   async function updateWinner(id: number, updateData: UpdateWinner) {
-    request.options.body = JSON.stringify(updateData);
-    await request.delete(`winners/${id}`);
+    await request.put<UpdateWinner>(`winners/${id}`, updateData);
   }
 
   return {
     winners,
+    winner,
     getWinners,
     getWinner,
     createWinner,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Win, Car } from "../common/model";
 
-const props = defineProps<{ winnerResults: Win; winnerCar: Car }>();
+const props = defineProps<{ winnerResults: Win; winnerCar?: Car }>();
 </script>
 
 <template>

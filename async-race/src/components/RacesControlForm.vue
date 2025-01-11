@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useGarageStore } from "../store/garageStore.ts";
+//import { useWinnersStore } from "../store/winnersStorage.ts";
 
 const garageStore = useGarageStore();
+//const winnersStore = useWinnersStore();
 const createCarText = ref<string>("");
 const createCarColor = ref<string>("");
 const updateCarText = ref<string>("");

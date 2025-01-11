@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useGarageStore } from "../store/garageStore.ts";
+import { useWinnersStore } from "../store/winnersStorage.ts";
 import { storeToRefs } from "pinia";
 import type { Car } from "../common/model.ts";
 import { ref, watchEffect } from "vue";
@@ -12,11 +13,50 @@ interface Animation {
 
 const props = defineProps<{ car: Car }>();
 const garageStore = useGarageStore();
-const { driveOptions } = storeToRefs(garageStore);
+const winnersStore = useWinnersStore();
+const { driveOptions, carDriveStatus } = storeToRefs(garageStore);
+const { winners } = storeToRefs(winnersStore);
 const carStyles = ref<Animation>({
   animation: `0s`,
   animationPlayState: "running",
   backgroundColor: `${props.car.color}`,
+});
+
+watchEffect(() => {
+  carDriveStatus;
+  winnersStore.getWinner(props.car.id);
+});
+
+watchEffect(() => {
+  driveOptions;
+  const driveOption = garageStore.driveOptions.find(
+    (options) => options.id === props.car.id,
+  );
+
+  if (!driveOption?.driveStatus) {
+    return;
+  }
+
+  const winnerData = winners.value.find((item) => item.id === props.car.id);
+  console.log(carDriveStatus.value);
+  console.log(winnerData);
+  console.log(driveOption);
+
+  if (!winnerData && driveOption) {
+    winnersStore.createWinner({
+      time: driveOption.time,
+      id: driveOption.id,
+      wins: 1,
+    });
+    return;
+  }
+
+  if (winnerData && driveOption) {
+    winnersStore.updateWinner(winnerData.id, {
+      time: driveOption.time,
+      wins: winnerData.wins + 1,
+    });
+  }
 });
 
 watchEffect(() => {
@@ -30,7 +70,7 @@ watchEffect(() => {
     (options) => options.id === props.car.id,
   );
 
-  if (driveOption?.driveStatus) {
+  if (driveOption?.startedStatus) {
     carStyles.value.animation = `drive ${driveOption?.time}ms forwards`;
     carStyles.value.animationPlayState = "running";
   } else {

@@ -10,6 +10,7 @@ export const useGarageStore = defineStore("garage", () => {
   const page = ref(1);
   const selectedCarId = ref<number | null>(null);
   const driveOptions = ref<DriveOptions[]>([]);
+  const carDriveStatus = ref<undefined | true>(undefined);
 
   watchEffect(() => {
     page;
@@ -42,27 +43,31 @@ export const useGarageStore = defineStore("garage", () => {
 
   async function startEngine(id: number) {
     driveOptions.value = [];
-    await request
-      .patch<Engine>(`engine?id=${id}&status=started`)
-      .then((engine) => {
-        const time = engine.distance / engine.velocity;
-        const driveStatus = true;
-        const resetStatus = false;
-        driveOptions.value = [
-          ...driveOptions.value,
-          { time, driveStatus, resetStatus, id },
-        ];
-      });
+    carDriveStatus.value = undefined;
+
+    const requestStartEngine = await request.patch<Engine>(
+      `engine?id=${id}&status=started`,
+    );
+    const time = requestStartEngine.distance / requestStartEngine.velocity;
+    const startedStatus = true;
+    const resetStatus = false;
+    const driveStatus = false;
+    driveOptions.value = [
+      ...driveOptions.value,
+      { time, startedStatus, driveStatus, resetStatus, id },
+    ];
 
     await request
       .patch<Drive>(`engine?id=${id}&status=drive`)
       .catch(() => {
         const findedCar = driveOptions.value.findIndex((car) => car.id === id);
-        driveOptions.value[findedCar].driveStatus = false;
+        driveOptions.value[findedCar].startedStatus = false;
       })
       .then((value) => {
+        const findedCar = driveOptions.value.findIndex((car) => car.id === id);
+
         if (value) {
-          console.log(value);
+          driveOptions.value[findedCar].driveStatus = true;
         }
       });
   }
@@ -117,6 +122,7 @@ export const useGarageStore = defineStore("garage", () => {
     page,
     selectedCarId,
     driveOptions,
+    carDriveStatus,
     selectCar,
     getGarage,
     createCar,
