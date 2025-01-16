@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import type { Win, Car } from "../common/model";
+import type { Winner } from "../common/model";
+import { useGarageStore } from "../store/garageStore";
+import { storeToRefs } from "pinia";
 
-const props = defineProps<{ winnerResults: Win; winnerCar?: Car }>();
+const garageStorage = useGarageStore();
+const { car } = storeToRefs(garageStorage);
+
+const props = defineProps<{ winnerResults: Winner }>();
+garageStorage.getCar(props.winnerResults.id);
 </script>
 
 <template>
@@ -13,11 +19,8 @@ const props = defineProps<{ winnerResults: Win; winnerCar?: Car }>();
     </div>
     <p>Winner Car</p>
     <div class="winner-params">
-      <div
-        class="car"
-        :style="{ 'background-color': props.winnerCar?.color }"
-      ></div>
-      <p>{{ winnerCar?.name }}</p>
+      <div class="car" :style="{ 'background-color': car?.color }"></div>
+      <p>{{ car?.name }}</p>
     </div>
   </div>
 </template>

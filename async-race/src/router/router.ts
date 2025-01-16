@@ -1,24 +1,24 @@
-import type { DefineComponent } from "vue";
-import { createRouter, createWebHistory } from "vue-router";
-import Main from "../views/main.vue";
-import Winners from "../views/Winners.vue";
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+} from "vue-router";
 
-interface Routes {
-  path: string;
-  name: string;
-  component: DefineComponent<{}, {}, any>;
-}
-
-const routes: Routes[] = [
+const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "Main",
-    component: Main,
+    component: () => import("../views/main.vue"),
   },
   {
     path: "/winners",
     name: "Winners",
-    component: Winners,
+    component: () => import("../views/Winners.vue"),
+  },
+  {
+    path: "/:catchAll(.*)",
+    name: "404",
+    component: () => "",
   },
 ];
 

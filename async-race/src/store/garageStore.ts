@@ -1,21 +1,29 @@
 import { defineStore } from "pinia";
-import type { Car, Drive, DriveOptions, Engine } from "../common/model";
+import type { Car, DriveOptions } from "../common/model";
 import { getCarBrand, getRandomColor } from "../common/functions";
-import { request } from "../utils/requests.ts";
-import { ref, watchEffect } from "vue";
+import { ref, watch } from "vue";
+import {
+  createCar,
+  deleteCar,
+  getCar,
+  getGarage,
+  startEngine,
+  stopEngine,
+  switchEngine,
+  updateCar,
+} from "../utils/engine";
 
 export const useGarageStore = defineStore("garage", () => {
   const garage = ref<Car[]>([]);
-  const limit = ref(7);
+  const limit = 7;
   const page = ref(1);
   const selectedCarId = ref<number | null>(null);
   const driveOptions = ref<DriveOptions[]>([]);
-  const carDriveStatus = ref<undefined | true>(undefined);
+  const carDriveStatus = ref<true>();
+  const car = ref<Car>();
 
-  watchEffect(() => {
-    page;
-    garage;
-    getGarage();
+  watch(page, () => {
+    getCars();
   });
 
   function nextPage() {
@@ -23,9 +31,6 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   function previousPage() {
-    if (!page.value) {
-      return;
-    }
     page.value -= 1;
   }
 
@@ -34,31 +39,33 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   function startAllEngines() {
-    garage.value.forEach((car) => startEngine(car.id));
+    garage.value.forEach((car) => startCarEngine(car.id));
   }
 
   function stopAllEngines() {
-    garage.value.forEach((car) => stopEngine(car.id));
+    garage.value.forEach((car) => stopCarEngine(car.id));
   }
 
-  async function startEngine(id: number) {
+  function startCarEngine(id: number) {
     driveOptions.value = [];
     carDriveStatus.value = undefined;
 
-    const requestStartEngine = await request.patch<Engine>(
-      `engine?id=${id}&status=started`,
-    );
-    const time = requestStartEngine.distance / requestStartEngine.velocity;
-    const startedStatus = true;
-    const resetStatus = false;
-    const driveStatus = false;
-    driveOptions.value = [
-      ...driveOptions.value,
-      { time, startedStatus, driveStatus, resetStatus, id },
-    ];
+    startEngine(id).then((value) => {
+      const time = value.distance / value.velocity;
 
-    await request
-      .patch<Drive>(`engine?id=${id}&status=drive`)
+      driveOptions.value = [
+        ...driveOptions.value,
+        {
+          time,
+          startedStatus: true,
+          driveStatus: false,
+          resetStatus: false,
+          id,
+        },
+      ];
+    });
+
+    switchEngine(id)
       .catch(() => {
         const findedCar = driveOptions.value.findIndex((car) => car.id === id);
         driveOptions.value[findedCar].startedStatus = false;
@@ -72,49 +79,50 @@ export const useGarageStore = defineStore("garage", () => {
       });
   }
 
-  async function stopEngine(id: number) {
-    await request.patch(`engine?id=${id}&status=stopped`).then(() => {
+  function stopCarEngine(id: number) {
+    stopEngine(id).then(() => {
       const findedCar = driveOptions.value.findIndex((car) => car.id === id);
       driveOptions.value[findedCar].resetStatus = true;
     });
   }
 
-  async function getGarage() {
-    await request
-      .get<Car[]>(`garage?_page=${page.value}&_limit=${limit.value}`)
-      .then((cars) => {
-        garage.value = cars;
-      });
+  function getCars() {
+    getGarage(limit, page.value).then((cars) => {
+      garage.value = cars;
+    });
     return garage;
   }
 
-  async function createCar(name: string, color: string) {
-    const dataParams = { name, color };
+  function getOneCar(id: number) {
+    getCar(id).then((value) => {
+      car.value = value;
+    });
+    return car.value;
+  }
 
-    await request.post("garage", dataParams);
-    getGarage();
+  function generateCar(name: string, color: string) {
+    createCar(name, color);
+    getCars();
   }
 
   function createCars() {
-    for (let i = 0; i < 50; i++) {
-      createCar(getCarBrand(), getRandomColor());
+    for (let i = 0; i < 100; i++) {
+      generateCar(getCarBrand(), getRandomColor());
     }
   }
 
-  async function deleteCar(id: number) {
-    await request.delete(`garage/${id}`);
-    getGarage();
+  function removeCar(id: number) {
+    deleteCar(id);
+    getCars();
   }
 
-  async function updateCar(name: string, color: string) {
+  function updatCar(name: string, color: string) {
     if (selectedCarId.value === null) {
       return;
     }
 
-    const dataParams = { name, color };
-
-    await request.put<Car>(`/garage/${selectedCarId.value}`, dataParams);
-    getGarage();
+    updateCar(name, color, selectedCarId.value);
+    getCars();
   }
 
   return {
@@ -123,16 +131,18 @@ export const useGarageStore = defineStore("garage", () => {
     selectedCarId,
     driveOptions,
     carDriveStatus,
+    car,
     selectCar,
-    getGarage,
-    createCar,
-    deleteCar,
-    updateCar,
+    getGarage: getCars,
+    getCar: getOneCar,
+    createCar: generateCar,
+    deleteCar: removeCar,
+    updateCar: updatCar,
     createCars,
     nextPage,
     previousPage,
-    startEngine,
-    stopEngine,
+    startEngine: startCarEngine,
+    stopEngine: stopCarEngine,
     startAllEngines,
     stopAllEngines,
   };

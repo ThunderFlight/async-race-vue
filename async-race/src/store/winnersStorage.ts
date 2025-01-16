@@ -1,22 +1,23 @@
 import { defineStore } from "pinia";
 import { ref, watchEffect } from "vue";
-import { request } from "../utils/requests";
-import type { Win } from "../common/model";
-
-interface UpdateWinner {
-  wins: number;
-  time: number;
-}
+import type { UpdateWinner, Winner } from "../common/model";
+import {
+  createWinner,
+  deleteWinner,
+  getWinner,
+  getWinners,
+  updateWinner,
+} from "../utils/winners";
 
 export const useWinnersStore = defineStore("winners", () => {
-  const winners = ref<Win[]>([]);
-  const limit = ref(7);
+  const winners = ref<Winner[]>([]);
+  const limit = 7;
   const page = ref(1);
-  const winner = ref<Win | null>(null);
+  const winner = ref<Winner>();
 
   watchEffect(() => {
     page;
-    getWinners();
+    getAllWinners();
   });
 
   function nextPage() {
@@ -24,47 +25,43 @@ export const useWinnersStore = defineStore("winners", () => {
   }
 
   function previousPage() {
-    if (!page.value) {
-      return;
-    }
     page.value -= 1;
   }
 
-  async function getWinners() {
-    winner.value = null;
-    await request
-      .get<Win[]>(`winners?_page${page.value}$_limit=${limit.value}`)
-      .then((win) => {
-        winners.value = win;
-      });
+  function getAllWinners() {
+    winners.value = [];
+
+    getWinners(page.value, limit).then((win) => {
+      winners.value = win;
+    });
   }
 
-  async function getWinner(id: number) {
-    await request.get<Win>(`winners/${id}`).then((response) => {
+  async function getLWinner(id: number) {
+    getWinner(id).then((response) => {
       winner.value = { time: response.time, wins: response.wins, id };
     });
   }
 
-  async function createWinner(newWinner: Win) {
-    await request.post<Win>(`winners`, newWinner);
+  async function createLWinner(newWinner: Winner) {
+    createWinner(newWinner);
   }
 
-  async function deleteWinner(id: number) {
-    await request.delete(`winners/${id}`);
+  async function deleteLWinner(id: number) {
+    deleteWinner(id);
   }
 
-  async function updateWinner(id: number, updateData: UpdateWinner) {
-    await request.put<UpdateWinner>(`winners/${id}`, updateData);
+  async function updateLWinner(id: number, updateData: UpdateWinner) {
+    updateWinner(id, updateData);
   }
 
   return {
     winners,
     winner,
-    getWinners,
-    getWinner,
-    createWinner,
-    deleteWinner,
-    updateWinner,
+    getWinners: getAllWinners,
+    getWinner: getLWinner,
+    createWinner: createLWinner,
+    deleteWinner: deleteLWinner,
+    updateWinner: updateLWinner,
     nextPage,
     previousPage,
   };

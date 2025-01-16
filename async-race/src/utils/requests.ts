@@ -1,5 +1,8 @@
-import { mande } from "mande";
+const envBaseUrl = import.meta.env.VITE_API_URL;
 
-const baseUrl = "http://127.0.0.1:3000/";
-
-export const request = mande(baseUrl);
+export function baseUrl(path?: string) {
+  if (!path) {
+    return envBaseUrl;
+  }
+  return envBaseUrl + path;
+}

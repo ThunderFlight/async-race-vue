@@ -3,32 +3,33 @@ import { useGarageStore } from "../store/garageStore.ts";
 import { useWinnersStore } from "../store/winnersStorage.ts";
 import { storeToRefs } from "pinia";
 import type { Car } from "../common/model.ts";
-import { ref, watchEffect } from "vue";
+import { ref, watchEffect, watch } from "vue";
 
-interface Animation {
+interface AnimationOptions {
   animation: string;
   animationPlayState: string;
   backgroundColor?: string;
 }
 
 const props = defineProps<{ car: Car }>();
+
 const garageStore = useGarageStore();
 const winnersStore = useWinnersStore();
+
 const { driveOptions, carDriveStatus } = storeToRefs(garageStore);
 const { winners } = storeToRefs(winnersStore);
-const carStyles = ref<Animation>({
+
+const carStyles = ref<AnimationOptions>({
   animation: `0s`,
   animationPlayState: "running",
   backgroundColor: `${props.car.color}`,
 });
 
-watchEffect(() => {
-  carDriveStatus;
-  winnersStore.getWinner(props.car.id);
-});
+carStyles.value.backgroundColor = `${props.car.color}`;
 
-watchEffect(() => {
-  driveOptions;
+watch(carDriveStatus, () => winnersStore.getWinner(props.car.id));
+
+watch(driveOptions, () => {
   const driveOption = garageStore.driveOptions.find(
     (options) => options.id === props.car.id,
   );
@@ -38,9 +39,6 @@ watchEffect(() => {
   }
 
   const winnerData = winners.value.find((item) => item.id === props.car.id);
-  console.log(carDriveStatus.value);
-  console.log(winnerData);
-  console.log(driveOption);
 
   if (!winnerData && driveOption) {
     winnersStore.createWinner({
@@ -57,11 +55,6 @@ watchEffect(() => {
       wins: winnerData.wins + 1,
     });
   }
-});
-
-watchEffect(() => {
-  props;
-  carStyles.value.backgroundColor = `${props.car.color}`;
 });
 
 watchEffect(() => {

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { reactive } from "vue";
 import { useGarageStore } from "../store/garageStore.ts";
-//import { useWinnersStore } from "../store/winnersStorage.ts";
 
 const garageStore = useGarageStore();
-//const winnersStore = useWinnersStore();
-const createCarText = ref<string>("");
-const createCarColor = ref<string>("");
-const updateCarText = ref<string>("");
-const updateCarColor = ref<string>("");
+const formValues = reactive({
+  createCarText: "",
+  createCarColor: "",
+  updateCarText: "",
+  updateCarColor: "",
+});
 </script>
 
 <template>
@@ -18,19 +18,37 @@ const updateCarColor = ref<string>("");
       <button @click.permit="garageStore.stopAllEngines()">restart</button>
     </div>
     <div class="create-car-wrapper">
-      <input type="text" placeholder="type car brand" v-model="createCarText" />
-      <input type="color" v-model="createCarColor" />
+      <input
+        type="text"
+        placeholder="type car brand"
+        v-model="formValues.createCarText"
+      />
+      <input type="color" v-model="formValues.createCarColor" />
       <button
-        @click.prevent="garageStore.createCar(createCarText, createCarColor)"
+        @click.prevent="
+          garageStore.createCar(
+            formValues.createCarText,
+            formValues.createCarColor,
+          )
+        "
       >
         create
       </button>
     </div>
     <div class="udpate-car-wrapper">
-      <input type="text" placeholder="type car brand" v-model="updateCarText" />
-      <input type="color" v-model="updateCarColor" />
+      <input
+        type="text"
+        placeholder="type car brand"
+        v-model="formValues.updateCarText"
+      />
+      <input type="color" v-model="formValues.updateCarColor" />
       <button
-        @click.prevent="garageStore.updateCar(updateCarText, updateCarColor)"
+        @click.prevent="
+          garageStore.updateCar(
+            formValues.updateCarText,
+            formValues.updateCarColor,
+          )
+        "
       >
         update
       </button>

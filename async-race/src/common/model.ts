@@ -21,8 +21,13 @@ export interface DriveOptions {
   id: number;
 }
 
-export interface Win {
+export interface Winner {
   id: number;
+  wins: number;
+  time: number;
+}
+
+export interface UpdateWinner {
   wins: number;
   time: number;
 }

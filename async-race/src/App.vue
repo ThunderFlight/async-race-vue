@@ -1,11 +1,11 @@
 <script setup lang="ts"></script>
 
 <template>
-  <nav id="nav">
+  <nav>
     <RouterLink to="/">Main</RouterLink>
     <RouterLink to="/winners">Winners</RouterLink>
   </nav>
-  <div class="container"><RouterView /></div>
+  <div><RouterView /></div>
 </template>
 
 <style scoped></style>

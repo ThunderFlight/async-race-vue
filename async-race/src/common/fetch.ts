@@ -23,15 +23,3 @@ export function useFetch<T>(
   });
   return { data, error };
 }
-
-export function useWatchFetch(
-  data: Ref,
-  url: string,
-  requestParams?: RequestInit,
-) {
-  watchEffect(async () => {
-    const response = await fetch(url, requestParams);
-    data.value = await response.json();
-    console.log(data.value);
-  });
-}
