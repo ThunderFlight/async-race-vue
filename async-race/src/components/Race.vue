@@ -3,7 +3,7 @@ import { useGarageStore } from "../store/garageStore.ts";
 import { useWinnersStore } from "../store/winnersStorage.ts";
 import { storeToRefs } from "pinia";
 import type { Car } from "../common/model.ts";
-import { ref, watchEffect, watch } from "vue";
+import { ref, watch } from "vue";
 
 interface AnimationOptions {
   animation: string;
@@ -29,51 +29,63 @@ carStyles.value.backgroundColor = `${props.car.color}`;
 
 watch(carDriveStatus, () => winnersStore.getWinner(props.car.id));
 
-watch(driveOptions, () => {
-  const driveOption = garageStore.driveOptions.find(
-    (options) => options.id === props.car.id,
-  );
+watch(
+  () => driveOptions,
+  (newDriveOptions) => {
+    const driveOption = newDriveOptions.value.find(
+      (options) => options.id === props.car.id,
+    );
 
-  if (!driveOption?.driveStatus) {
-    return;
-  }
+    if (!driveOption?.driveStatus) {
+      return;
+    }
 
-  const winnerData = winners.value.find((item) => item.id === props.car.id);
+    const winnerData = winners.value.find((item) => item.id === props.car.id);
 
-  if (!winnerData && driveOption) {
-    winnersStore.createWinner({
-      time: driveOption.time,
-      id: driveOption.id,
-      wins: 1,
-    });
-    return;
-  }
+    if (!winnerData && driveOption) {
+      winnersStore.createWinner({
+        time: driveOption.time,
+        id: driveOption.id,
+        wins: 1,
+      });
+      return;
+    }
 
-  if (winnerData && driveOption) {
-    winnersStore.updateWinner(winnerData.id, {
-      time: driveOption.time,
-      wins: winnerData.wins + 1,
-    });
-  }
-});
+    if (winnerData && driveOption) {
+      winnersStore.updateWinner(winnerData.id, {
+        time: driveOption.time,
+        wins: winnerData.wins + 1,
+      });
+    }
+  },
+  { deep: true },
+);
 
-watchEffect(() => {
-  driveOptions;
-  const driveOption = garageStore.driveOptions.find(
-    (options) => options.id === props.car.id,
-  );
+watch(
+  () => driveOptions.value,
+  (newDriveOptions) => {
+    const driveOption = newDriveOptions.find(
+      (options) => options.id === props.car.id,
+    );
+    console.log(driveOption?.id);
 
-  if (driveOption?.startedStatus) {
-    carStyles.value.animation = `drive ${driveOption?.time}ms forwards`;
-    carStyles.value.animationPlayState = "running";
-  } else {
-    carStyles.value.animationPlayState = "paused";
-  }
+    if (!driveOption) {
+      return;
+    }
 
-  if (driveOption?.resetStatus) {
-    carStyles.value.animation = "";
-  }
-});
+    if (driveOption?.startedStatus) {
+      carStyles.value.animation = `drive ${driveOption?.time}ms forwards`;
+      carStyles.value.animationPlayState = "running";
+    } else {
+      carStyles.value.animationPlayState = "paused";
+    }
+
+    if (driveOption?.resetStatus) {
+      carStyles.value.animation = "";
+    }
+  },
+  { deep: true },
+);
 </script>
 
 <template>

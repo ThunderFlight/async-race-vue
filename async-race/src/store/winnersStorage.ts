@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, watchEffect } from "vue";
+import { ref, watch } from "vue";
 import type { UpdateWinner, Winner } from "../common/model";
 import {
   createWinner,
@@ -15,8 +15,7 @@ export const useWinnersStore = defineStore("winners", () => {
   const page = ref(1);
   const winner = ref<Winner>();
 
-  watchEffect(() => {
-    page;
+  watch(page, () => {
     getAllWinners();
   });
 
@@ -44,14 +43,17 @@ export const useWinnersStore = defineStore("winners", () => {
 
   async function createLWinner(newWinner: Winner) {
     createWinner(newWinner);
+    getAllWinners();
   }
 
   async function deleteLWinner(id: number) {
     deleteWinner(id);
+    getAllWinners();
   }
 
   async function updateLWinner(id: number, updateData: UpdateWinner) {
     updateWinner(id, updateData);
+    getAllWinners();
   }
 
   return {
