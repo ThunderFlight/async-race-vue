@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { ref, watch } from "vue";
-import type { UpdateWinner, Winner } from "../common/model";
 import {
   createWinner,
   deleteWinner,
@@ -8,6 +7,8 @@ import {
   getWinners,
   updateWinner,
 } from "../utils/winners";
+import type { Winner } from "../common/models/winner";
+import type { UpdateWinner } from "../common/models/updateWiner";
 
 export const useWinnersStore = defineStore("winners", () => {
   const winners = ref<Winner[]>([]);
@@ -35,25 +36,22 @@ export const useWinnersStore = defineStore("winners", () => {
     });
   }
 
-  async function getLWinner(id: number) {
+  function getLWinner(id: number) {
     getWinner(id).then((response) => {
       winner.value = { time: response.time, wins: response.wins, id };
     });
   }
 
-  async function createLWinner(newWinner: Winner) {
-    createWinner(newWinner);
-    getAllWinners();
+  function createLWinner(newWinner: Winner) {
+    createWinner(newWinner).then(() => getAllWinners());
   }
 
-  async function deleteLWinner(id: number) {
-    deleteWinner(id);
-    getAllWinners();
+  function deleteLWinner(id: number) {
+    deleteWinner(id).then(() => getAllWinners());
   }
 
-  async function updateLWinner(id: number, updateData: UpdateWinner) {
-    updateWinner(id, updateData);
-    getAllWinners();
+  function updateLWinner(id: number, updateData: UpdateWinner) {
+    updateWinner(id, updateData).then(() => getAllWinners());
   }
 
   return {

@@ -2,8 +2,8 @@
 import { useGarageStore } from "../store/garageStore.ts";
 import { useWinnersStore } from "../store/winnersStorage.ts";
 import { storeToRefs } from "pinia";
-import type { Car } from "../common/model.ts";
-import { ref, watch } from "vue";
+import type { Car, DriveOption, Winner } from "../common/model.ts";
+import { reactive, watch } from "vue";
 
 interface AnimationOptions {
   animation: string;
@@ -11,7 +11,7 @@ interface AnimationOptions {
   backgroundColor?: string;
 }
 
-const props = defineProps<{ car: Car }>();
+const props = defineProps<Car>();
 
 const garageStore = useGarageStore();
 const winnersStore = useWinnersStore();
@@ -19,70 +19,83 @@ const winnersStore = useWinnersStore();
 const { driveOptions, carDriveStatus } = storeToRefs(garageStore);
 const { winners } = storeToRefs(winnersStore);
 
-const carStyles = ref<AnimationOptions>({
+const carStyles = reactive<AnimationOptions>({
   animation: `0s`,
   animationPlayState: "running",
-  backgroundColor: `${props.car.color}`,
+  backgroundColor: `${props.color}`,
 });
 
-carStyles.value.backgroundColor = `${props.car.color}`;
+watch(carDriveStatus, () => winnersStore.getWinner(props.id));
 
-watch(carDriveStatus, () => winnersStore.getWinner(props.car.id));
+function winnerDoesntExist(driveOption: DriveOption) {
+  const createWinnerData = {
+    time: driveOption.time,
+    id: driveOption.id,
+    wins: 1,
+  };
+  winnersStore.createWinner(createWinnerData);
+  return;
+}
+
+function winnerExist(winnerData: Winner, driveOption: DriveOption) {
+  const updateWinnerData = {
+    time: driveOption.time,
+    wins: winnerData.wins + 1,
+  };
+  winnersStore.updateWinner(winnerData.id, updateWinnerData);
+}
 
 watch(
   () => driveOptions,
   (newDriveOptions) => {
     const driveOption = newDriveOptions.value.find(
-      (options) => options.id === props.car.id,
+      (options) => options.id === props.id,
     );
+    const winnerData = winners.value.find((item) => item.id === props.id);
 
     if (!driveOption?.driveStatus) {
       return;
     }
 
-    const winnerData = winners.value.find((item) => item.id === props.car.id);
-
     if (!winnerData && driveOption) {
-      winnersStore.createWinner({
-        time: driveOption.time,
-        id: driveOption.id,
-        wins: 1,
-      });
-      return;
+      winnerDoesntExist(driveOption);
     }
 
     if (winnerData && driveOption) {
-      winnersStore.updateWinner(winnerData.id, {
-        time: driveOption.time,
-        wins: winnerData.wins + 1,
-      });
+      winnerExist(winnerData, driveOption);
     }
   },
   { deep: true },
 );
 
+function setAnimations(driveOption: DriveOption) {
+  if (driveOption.startedStatus) {
+    carStyles.animation = `drive ${driveOption.time}ms forwards`;
+    carStyles.animationPlayState = "running";
+  } else {
+    carStyles.animationPlayState = "paused";
+  }
+}
+
+function resetAnimations(driveOption: DriveOption) {
+  if (driveOption.resetStatus) {
+    carStyles.animation = "";
+  }
+}
+
 watch(
   () => driveOptions.value,
   (newDriveOptions) => {
     const driveOption = newDriveOptions.find(
-      (options) => options.id === props.car.id,
+      (options) => options.id === props.id,
     );
-    console.log(driveOption?.id);
 
     if (!driveOption) {
       return;
     }
 
-    if (driveOption?.startedStatus) {
-      carStyles.value.animation = `drive ${driveOption?.time}ms forwards`;
-      carStyles.value.animationPlayState = "running";
-    } else {
-      carStyles.value.animationPlayState = "paused";
-    }
-
-    if (driveOption?.resetStatus) {
-      carStyles.value.animation = "";
-    }
+    setAnimations(driveOption);
+    resetAnimations(driveOption);
   },
   { deep: true },
 );
@@ -94,36 +107,30 @@ watch(
       <div class="car-customization">
         <button
           class="select-car"
-          @click.permit="garageStore.selectCar(props.car.id)"
+          @click.permit="garageStore.selectCar(props.id)"
         >
           select
         </button>
         <button
           class="remove-car"
-          @click.permit="garageStore.deleteCar(props.car.id)"
+          @click.permit="garageStore.deleteCar(props.id)"
         >
           remove
         </button>
       </div>
 
       <div class="car-race-cntrol">
-        <button
-          class="start"
-          @click.permit="garageStore.startEngine(props.car.id)"
-        >
+        <button class="start" @click.permit="garageStore.startEngine(props.id)">
           a
         </button>
-        <button
-          class="stop"
-          @click.permit="garageStore.stopEngine(props.car.id)"
-        >
+        <button class="stop" @click.permit="garageStore.stopEngine(props.id)">
           b
         </button>
       </div>
     </div>
     <div class="road">
-      <div class="car animated" :style="carStyles"></div>
-      <p>{{ props.car.name }}</p>
+      <div class="car" :style="carStyles"></div>
+      <p>{{ props.name }}</p>
     </div>
   </div>
 </template>

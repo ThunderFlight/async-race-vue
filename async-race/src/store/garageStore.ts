@@ -1,24 +1,23 @@
 import { defineStore } from "pinia";
-import type { Car, DriveOptions } from "../common/model";
 import { getCarBrand, getRandomColor } from "../common/functions";
 import { ref, watch } from "vue";
+import { startEngine, stopEngine, switchEngine } from "../utils/engine";
 import {
   createCar,
   deleteCar,
   getCar,
   getGarage,
-  startEngine,
-  stopEngine,
-  switchEngine,
   updateCar,
-} from "../utils/engine";
+} from "../utils/garage";
+import type { Car } from "../common/models/car";
+import type { DriveOption } from "../common/models/driveOption";
 
 export const useGarageStore = defineStore("garage", () => {
   const garage = ref<Car[]>([]);
   const limit = 7;
   const page = ref(1);
   const selectedCarId = ref<number | null>(null);
-  const driveOptions = ref<DriveOptions[]>([]);
+  const driveOptions = ref<DriveOption[]>([]);
   const carDriveStatus = ref<true>();
   const car = ref<Car>();
 
@@ -101,8 +100,7 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   function generateCar(name: string, color: string) {
-    createCar(name, color);
-    getCars();
+    createCar(name, color).then(() => getCars());
   }
 
   function createCars() {
@@ -112,8 +110,7 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   function removeCar(id: number) {
-    deleteCar(id);
-    getCars();
+    deleteCar(id).then(() => getCars());
   }
 
   function updatCar(name: string, color: string) {
@@ -121,8 +118,7 @@ export const useGarageStore = defineStore("garage", () => {
       return;
     }
 
-    updateCar(name, color, selectedCarId.value);
-    getCars();
+    updateCar(name, color, selectedCarId.value).then(() => getCars());
   }
 
   return {

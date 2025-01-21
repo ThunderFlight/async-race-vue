@@ -18,7 +18,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/:catchAll(.*)",
     name: "404",
-    component: () => "",
+    component: () => import("../views/PageNotFound.vue"),
   },
 ];
 

@@ -5,6 +5,7 @@ import { storeToRefs } from "pinia";
 
 const winnerStorage = useWinnersStore();
 const { winners } = storeToRefs(winnerStorage);
+
 winnerStorage.getWinners();
 </script>
 

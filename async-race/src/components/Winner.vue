@@ -3,10 +3,11 @@ import type { Winner } from "../common/model";
 import { useGarageStore } from "../store/garageStore";
 import { storeToRefs } from "pinia";
 
+const props = defineProps<{ winnerResults: Winner }>();
+
 const garageStorage = useGarageStore();
 const { car } = storeToRefs(garageStorage);
 
-const props = defineProps<{ winnerResults: Winner }>();
 garageStorage.getCar(props.winnerResults.id);
 </script>
 

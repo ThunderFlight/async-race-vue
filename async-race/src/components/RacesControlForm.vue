@@ -3,12 +3,21 @@ import { reactive } from "vue";
 import { useGarageStore } from "../store/garageStore.ts";
 
 const garageStore = useGarageStore();
+
 const formValues = reactive({
   createCarText: "",
   createCarColor: "",
   updateCarText: "",
   updateCarColor: "",
 });
+
+function createCar() {
+  garageStore.createCar(formValues.createCarText, formValues.createCarColor);
+}
+
+function updateCar() {
+  garageStore.updateCar(formValues.updateCarText, formValues.updateCarColor);
+}
 </script>
 
 <template>
@@ -24,16 +33,7 @@ const formValues = reactive({
         v-model="formValues.createCarText"
       />
       <input type="color" v-model="formValues.createCarColor" />
-      <button
-        @click.prevent="
-          garageStore.createCar(
-            formValues.createCarText,
-            formValues.createCarColor,
-          )
-        "
-      >
-        create
-      </button>
+      <button @click.prevent="createCar()">create</button>
     </div>
     <div class="udpate-car-wrapper">
       <input
@@ -42,16 +42,7 @@ const formValues = reactive({
         v-model="formValues.updateCarText"
       />
       <input type="color" v-model="formValues.updateCarColor" />
-      <button
-        @click.prevent="
-          garageStore.updateCar(
-            formValues.updateCarText,
-            formValues.updateCarColor,
-          )
-        "
-      >
-        update
-      </button>
+      <button @click.prevent="updateCar()">update</button>
     </div>
     <button @click.prevent="garageStore.createCars()">generate cars</button>
   </div>
