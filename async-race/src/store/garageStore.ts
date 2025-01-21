@@ -11,6 +11,8 @@ import {
 } from "../utils/garage";
 import type { Car } from "../common/models/car";
 import type { DriveOption } from "../common/models/driveOption";
+import type { Engine } from "../common/models/engine";
+import type { Drive } from "../common/models/drive";
 
 export const useGarageStore = defineStore("garage", () => {
   const garage = ref<Car[]>([]);
@@ -45,37 +47,43 @@ export const useGarageStore = defineStore("garage", () => {
     garage.value.forEach((car) => stopCarEngine(car.id));
   }
 
+  function setDriveOptionsParams(value: Engine, id: number) {
+    const time = value.distance / value.velocity;
+
+    driveOptions.value = [
+      ...driveOptions.value,
+      {
+        time,
+        startedStatus: true,
+        driveStatus: false,
+        resetStatus: false,
+        id,
+      },
+    ];
+  }
+
+  function setEngineStatus(id: number) {
+    const findedCar = driveOptions.value.findIndex((car) => car.id === id);
+    driveOptions.value[findedCar].startedStatus = false;
+  }
+
+  function setDriveStatus(value: Drive | void, id: number) {
+    const findedCar = driveOptions.value.findIndex((car) => car.id === id);
+
+    if (value) {
+      driveOptions.value[findedCar].driveStatus = true;
+    }
+  }
+
   function startCarEngine(id: number) {
     driveOptions.value = [];
     carDriveStatus.value = undefined;
 
-    startEngine(id).then((value) => {
-      const time = value.distance / value.velocity;
-
-      driveOptions.value = [
-        ...driveOptions.value,
-        {
-          time,
-          startedStatus: true,
-          driveStatus: false,
-          resetStatus: false,
-          id,
-        },
-      ];
-    });
+    startEngine(id).then((value) => setDriveOptionsParams(value, id));
 
     switchEngine(id)
-      .catch(() => {
-        const findedCar = driveOptions.value.findIndex((car) => car.id === id);
-        driveOptions.value[findedCar].startedStatus = false;
-      })
-      .then((value) => {
-        const findedCar = driveOptions.value.findIndex((car) => car.id === id);
-
-        if (value) {
-          driveOptions.value[findedCar].driveStatus = true;
-        }
-      });
+      .catch(() => setEngineStatus(id))
+      .then((value) => setDriveStatus(value, id));
   }
 
   function stopCarEngine(id: number) {

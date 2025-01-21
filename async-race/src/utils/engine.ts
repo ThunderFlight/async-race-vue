@@ -1,5 +1,5 @@
 import { mande } from "mande";
-import { baseUrl } from "./requests";
+import { baseUrl } from "./baseUrl";
 import type { Engine } from "../common/models/engine";
 import type { Drive } from "../common/models/drive";
 

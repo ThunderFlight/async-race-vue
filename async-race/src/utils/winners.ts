@@ -1,5 +1,5 @@
 import { mande } from "mande";
-import { baseUrl } from "./requests";
+import { baseUrl } from "./baseUrl";
 import type { Winner } from "../common/models/winner";
 import type { UpdateWinner } from "../common/models/updateWiner";
 
