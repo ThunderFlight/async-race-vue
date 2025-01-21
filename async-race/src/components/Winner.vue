@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Winner } from "../common/model";
+import type { Winner } from "../common/models/winner";
 import { useGarageStore } from "../store/garageStore";
 import { storeToRefs } from "pinia";
 

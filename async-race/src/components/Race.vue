@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { Car } from "../common/models/car.ts";
+import type { DriveOption } from "../common/models/driveOption.ts";
+import type { Winner } from "../common/models/winner.ts";
 import { useGarageStore } from "../store/garageStore.ts";
 import { useWinnersStore } from "../store/winnersStorage.ts";
 import { storeToRefs } from "pinia";
-import type { Car, DriveOption, Winner } from "../common/model.ts";
 import { reactive, watch } from "vue";
 
 interface AnimationOptions {

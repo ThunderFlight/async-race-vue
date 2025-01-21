@@ -1,6 +1,7 @@
 import { mande } from "mande";
 import { baseUrl } from "./requests";
-import type { UpdateWinner, Winner } from "../common/model";
+import type { Winner } from "../common/models/winner";
+import type { UpdateWinner } from "../common/models/updateWiner";
 
 const winners = mande(baseUrl("winners"));
 
