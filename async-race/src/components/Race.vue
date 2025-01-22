@@ -27,8 +27,6 @@ const carStyles = reactive<AnimationOptions>({
   backgroundColor: `${props.color}`,
 });
 
-watch(carDriveStatus, () => winnersStore.getWinner(props.id));
-
 function winnerDoesntExist(driveOption: DriveOption) {
   const createWinnerData = {
     time: driveOption.time,
@@ -36,16 +34,17 @@ function winnerDoesntExist(driveOption: DriveOption) {
     wins: 1,
   };
   winnersStore.createWinner(createWinnerData);
-  return;
 }
 
-function winnerExist(winnerData: Winner, driveOption: DriveOption) {
+function updateExistingWinner(winnerData: Winner, driveOption: DriveOption) {
   const updateWinnerData = {
     time: driveOption.time,
     wins: winnerData.wins + 1,
   };
   winnersStore.updateWinner(winnerData.id, updateWinnerData);
 }
+
+watch(carDriveStatus, () => winnersStore.getWinner(props.id));
 
 watch(
   () => driveOptions,
@@ -61,28 +60,30 @@ watch(
 
     if (!winnerData && driveOption) {
       winnerDoesntExist(driveOption);
+      return;
     }
 
     if (winnerData && driveOption) {
-      winnerExist(winnerData, driveOption);
+      updateExistingWinner(winnerData, driveOption);
     }
   },
   { deep: true },
 );
 
-function setAnimations(driveOption: DriveOption) {
+function setAnimation(driveOption: DriveOption) {
   if (driveOption.startedStatus) {
     carStyles.animation = `drive ${driveOption.time}ms forwards`;
     carStyles.animationPlayState = "running";
-  } else {
-    carStyles.animationPlayState = "paused";
+    return;
   }
+  carStyles.animationPlayState = "paused";
 }
 
-function resetAnimations(driveOption: DriveOption) {
-  if (driveOption.resetStatus) {
-    carStyles.animation = "";
+function resetAnimation(driveOption: DriveOption) {
+  if (!driveOption.resetStatus) {
+    return;
   }
+  carStyles.animation = "";
 }
 
 watch(
@@ -96,8 +97,8 @@ watch(
       return;
     }
 
-    setAnimations(driveOption);
-    resetAnimations(driveOption);
+    setAnimation(driveOption);
+    resetAnimation(driveOption);
   },
   { deep: true },
 );

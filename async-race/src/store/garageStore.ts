@@ -18,7 +18,7 @@ export const useGarageStore = defineStore("garage", () => {
   const garage = ref<Car[]>([]);
   const limit = 7;
   const page = ref(1);
-  const selectedCarId = ref<number | null>(null);
+  const selectedCarId = ref<number>();
   const driveOptions = ref<DriveOption[]>([]);
   const carDriveStatus = ref<true>();
   const car = ref<Car>();
@@ -68,22 +68,25 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   function setDriveStatus(value: Drive | void, id: number) {
-    const findedCar = driveOptions.value.findIndex((car) => car.id === id);
-
-    if (value) {
-      driveOptions.value[findedCar].driveStatus = true;
+    if (!value) {
+      return;
     }
+
+    const findedCar = driveOptions.value.findIndex((car) => car.id === id);
+    driveOptions.value[findedCar].driveStatus = true;
   }
 
   function startCarEngine(id: number) {
     driveOptions.value = [];
     carDriveStatus.value = undefined;
 
-    startEngine(id).then((value) => setDriveOptionsParams(value, id));
-
-    switchEngine(id)
-      .catch(() => setEngineStatus(id))
-      .then((value) => setDriveStatus(value, id));
+    startEngine(id)
+      .then((value) => setDriveOptionsParams(value, id))
+      .then(() =>
+        switchEngine(id)
+          .catch(() => setEngineStatus(id))
+          .then((value) => setDriveStatus(value, id)),
+      );
   }
 
   function stopCarEngine(id: number) {
@@ -108,7 +111,7 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   function generateCar(name: string, color: string) {
-    createCar(name, color).then(() => getCars());
+    createCar(name, color).then(getCars);
   }
 
   function createCars() {
@@ -118,15 +121,15 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   function removeCar(id: number) {
-    deleteCar(id).then(() => getCars());
+    deleteCar(id).then(getCars);
   }
 
   function updatCar(name: string, color: string) {
-    if (selectedCarId.value === null) {
+    if (!selectedCarId.value) {
       return;
     }
 
-    updateCar(name, color, selectedCarId.value).then(() => getCars());
+    updateCar(name, color, selectedCarId.value).then(getCars);
   }
 
   return {

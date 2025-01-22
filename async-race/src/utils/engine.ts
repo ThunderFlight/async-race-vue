@@ -5,11 +5,14 @@ import type { Drive } from "../common/models/drive";
 
 const engine = mande(baseUrl("engine"));
 
-export const startEngine = (id: number) =>
-  engine.patch<Engine>(`?id=${id}&status=started`);
+export function startEngine(id: number) {
+  return engine.patch<Engine>(`?id=${id}&status=started`);
+}
 
-export const stopEngine = (id: number) =>
-  engine.patch<Drive>(`?id=${id}&status=stopped`);
+export function stopEngine(id: number) {
+  return engine.patch<Drive>(`?id=${id}&status=stopped`);
+}
 
-export const switchEngine = (id: number) =>
-  engine.patch<Drive>(`?id=${id}&status=drive`);
+export function switchEngine(id: number) {
+  return engine.patch<Drive>(`?id=${id}&status=drive`);
+}

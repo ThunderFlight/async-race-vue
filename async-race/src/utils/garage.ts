@@ -4,15 +4,22 @@ import type { Car } from "../common/models/car";
 
 const garage = mande(baseUrl("garage"));
 
-export const getGarage = async (limit: number, page: number) =>
-  await garage.get<Car[]>(`?_limit=${limit}_page=${page}`);
+export async function getGarage(limit: number, page: number) {
+  return await garage.get<Car[]>(`?_limit=${limit}_page=${page}`);
+}
 
-export const getCar = async (id: number) => await garage.get<Car>(`/${id}`);
+export async function getCar(id: number) {
+  return await garage.get<Car>(`/${id}`);
+}
 
-export const createCar = (name: string, color: string) =>
-  garage.post({ name, color });
+export function createCar(name: string, color: string) {
+  return garage.post({ name, color });
+}
 
-export const deleteCar = (id: number) => garage.post(`${id}`);
+export function deleteCar(id: number) {
+  return garage.post(`${id}`);
+}
 
-export const updateCar = (name: string, color: string, id: number) =>
-  garage.put<Car>(`${id}`, { name, color });
+export function updateCar(name: string, color: string, id: number) {
+  return garage.put<Car>(`${id}`, { name, color });
+}

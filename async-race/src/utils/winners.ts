@@ -5,16 +5,22 @@ import type { UpdateWinner } from "../common/models/updateWiner";
 
 const winners = mande(baseUrl("winners"));
 
-export const getWinners = async (page: number, limit: number) =>
-  await winners.get<Winner[]>(`?_limit=${limit}_page=${page}`);
+export async function getWinners(page: number, limit: number) {
+  return await winners.get<Winner[]>(`?_limit=${limit}_page=${page}`);
+}
 
-export const getWinner = async (id: number) =>
-  await winners.get<Winner>(`/${id}`);
+export async function getWinner(id: number) {
+  return await winners.get<Winner>(`/${id}`);
+}
 
-export const createWinner = (newWinner: Winner) =>
-  winners.post<Winner>(newWinner);
+export function createWinner(newWinner: Winner) {
+  return winners.post<Winner>(newWinner);
+}
 
-export const deleteWinner = (id: number) => winners.delete(`/${id}`);
+export function deleteWinner(id: number) {
+  return winners.delete(`/${id}`);
+}
 
-export const updateWinner = (id: number, updateData: UpdateWinner) =>
-  winners.put<UpdateWinner>(`/${id}`, updateData);
+export function updateWinner(id: number, updateData: UpdateWinner) {
+  return winners.put<UpdateWinner>(`/${id}`, updateData);
+}

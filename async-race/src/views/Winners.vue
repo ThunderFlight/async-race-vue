@@ -11,7 +11,7 @@ winnerStorage.getWinners();
 
 <template>
   <div v-for="winnerResults in winners">
-    <Winner :winnerResults="winnerResults" />
+    <Winner v-bind="winnerResults" />
   </div>
   <button @click.prevent="winnerStorage.nextPage()">next</button>
   <button @click.prevent="winnerStorage.previousPage()">previous</button>

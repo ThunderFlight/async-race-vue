@@ -42,16 +42,16 @@ export const useWinnersStore = defineStore("winners", () => {
     });
   }
 
-  function createLWinner(newWinner: Winner) {
-    createWinner(newWinner).then(() => getAllWinners());
+  function generateWinner(newWinner: Winner) {
+    createWinner(newWinner).then(getAllWinners);
   }
 
-  function deleteLWinner(id: number) {
-    deleteWinner(id).then(() => getAllWinners());
+  function removeWinner(id: number) {
+    deleteWinner(id).then(getAllWinners);
   }
 
   function updateLWinner(id: number, updateData: UpdateWinner) {
-    updateWinner(id, updateData).then(() => getAllWinners());
+    updateWinner(id, updateData).then(getAllWinners);
   }
 
   return {
@@ -59,8 +59,8 @@ export const useWinnersStore = defineStore("winners", () => {
     winner,
     getWinners: getAllWinners,
     getWinner: getLWinner,
-    createWinner: createLWinner,
-    deleteWinner: deleteLWinner,
+    createWinner: generateWinner,
+    deleteWinner: removeWinner,
     updateWinner: updateLWinner,
     nextPage,
     previousPage,

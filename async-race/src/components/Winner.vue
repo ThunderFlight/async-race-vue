@@ -3,20 +3,20 @@ import type { Winner } from "../common/models/winner";
 import { useGarageStore } from "../store/garageStore";
 import { storeToRefs } from "pinia";
 
-const props = defineProps<{ winnerResults: Winner }>();
+const props = defineProps<Winner>();
 
 const garageStorage = useGarageStore();
 const { car } = storeToRefs(garageStorage);
 
-garageStorage.getCar(props.winnerResults.id);
+garageStorage.getCar(props.id);
 </script>
 
 <template>
   <div class="winner-wrapper">
     <p>Results</p>
     <div class="winner-params">
-      <p>Wins: {{ props.winnerResults.wins }}</p>
-      <p>Time: {{ props.winnerResults.time }}s</p>
+      <p>Wins: {{ props.wins }}</p>
+      <p>Time: {{ props.time }}s</p>
     </div>
     <p>Winner Car</p>
     <div class="winner-params">
