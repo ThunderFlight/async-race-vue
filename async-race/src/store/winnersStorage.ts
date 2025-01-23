@@ -29,8 +29,6 @@ export const useWinnersStore = defineStore("winners", () => {
   }
 
   function getAllWinners() {
-    winners.value = [];
-
     getWinners(page.value, limit).then((win) => {
       winners.value = win;
     });

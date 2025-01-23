@@ -33,6 +33,7 @@ function winnerDoesntExist(driveOption: DriveOption) {
     id: driveOption.id,
     wins: 1,
   };
+
   winnersStore.createWinner(createWinnerData);
 }
 
@@ -41,10 +42,9 @@ function updateExistingWinner(winnerData: Winner, driveOption: DriveOption) {
     time: driveOption.time,
     wins: winnerData.wins + 1,
   };
+
   winnersStore.updateWinner(winnerData.id, updateWinnerData);
 }
-
-watch(carDriveStatus, () => winnersStore.getWinner(props.id));
 
 watch(
   () => driveOptions,
@@ -65,6 +65,7 @@ watch(
 
     if (winnerData && driveOption) {
       updateExistingWinner(winnerData, driveOption);
+      return;
     }
   },
   { deep: true },
@@ -76,6 +77,7 @@ function setAnimation(driveOption: DriveOption) {
     carStyles.animationPlayState = "running";
     return;
   }
+
   carStyles.animationPlayState = "paused";
 }
 
@@ -83,6 +85,7 @@ function resetAnimation(driveOption: DriveOption) {
   if (!driveOption.resetStatus) {
     return;
   }
+
   carStyles.animation = "";
 }
 

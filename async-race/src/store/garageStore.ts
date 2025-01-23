@@ -63,8 +63,8 @@ export const useGarageStore = defineStore("garage", () => {
   }
 
   function setEngineStatus(id: number) {
-    const findedCar = driveOptions.value.findIndex((car) => car.id === id);
-    driveOptions.value[findedCar].startedStatus = false;
+    const car = driveOptions.value.findIndex((car) => car.id === id);
+    driveOptions.value[car].startedStatus = false;
   }
 
   function setDriveStatus(value: Drive | void, id: number) {
@@ -72,8 +72,8 @@ export const useGarageStore = defineStore("garage", () => {
       return;
     }
 
-    const findedCar = driveOptions.value.findIndex((car) => car.id === id);
-    driveOptions.value[findedCar].driveStatus = true;
+    const car = driveOptions.value.findIndex((car) => car.id === id);
+    driveOptions.value[car].driveStatus = true;
   }
 
   function startCarEngine(id: number) {
@@ -91,23 +91,25 @@ export const useGarageStore = defineStore("garage", () => {
 
   function stopCarEngine(id: number) {
     stopEngine(id).then(() => {
-      const findedCar = driveOptions.value.findIndex((car) => car.id === id);
-      driveOptions.value[findedCar].resetStatus = true;
+      const car = driveOptions.value.findIndex((car) => car.id === id);
+      driveOptions.value[car].resetStatus = true;
     });
   }
 
   function getCars() {
     getGarage(limit, page.value).then((cars) => {
       garage.value = cars;
+
+      return garage;
     });
-    return garage;
   }
 
   function getOneCar(id: number) {
     getCar(id).then((value) => {
       car.value = value;
+
+      return car.value;
     });
-    return car.value;
   }
 
   function generateCar(name: string, color: string) {
