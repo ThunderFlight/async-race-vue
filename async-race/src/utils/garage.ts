@@ -9,7 +9,7 @@ export async function getGarage(limit: number, page: number) {
 }
 
 export async function getCar(id: number) {
-  return await garage.get<Car>(`/${id}`);
+  return await garage.get<Car>(`${id}`);
 }
 
 export function createCar(name: string, color: string) {
