@@ -54,19 +54,16 @@ watch(
     );
     const winnerData = winners.value.find((item) => item.id === props.id);
 
-    if (!driveOption?.driveStatus) {
+    if (!driveOption) {
       return;
     }
 
-    if (!winnerData && driveOption) {
+    if (!winnerData) {
       winnerDoesntExist(driveOption);
       return;
     }
 
-    if (winnerData && driveOption) {
-      updateExistingWinner(winnerData, driveOption);
-      return;
-    }
+    updateExistingWinner(winnerData, driveOption);
   },
   { deep: true },
 );
