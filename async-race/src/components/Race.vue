@@ -18,7 +18,7 @@ const props = defineProps<Car>();
 const garageStore = useGarageStore();
 const winnersStore = useWinnersStore();
 
-const { driveOptions, carDriveStatus } = storeToRefs(garageStore);
+const { driveOptions } = storeToRefs(garageStore);
 const { winners } = storeToRefs(winnersStore);
 
 const carStyles = reactive<AnimationOptions>({
@@ -27,7 +27,7 @@ const carStyles = reactive<AnimationOptions>({
   backgroundColor: `${props.color}`,
 });
 
-function winnerDoesntExist(driveOption: DriveOption) {
+function createWinnerDoesntExist(driveOption: DriveOption) {
   const createWinnerData = {
     time: driveOption.time,
     id: driveOption.id,
@@ -59,7 +59,7 @@ watch(
     }
 
     if (!winnerData) {
-      winnerDoesntExist(driveOption);
+      createWinnerDoesntExist(driveOption);
       return;
     }
 

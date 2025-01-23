@@ -2,7 +2,7 @@
 import type { Car } from "../common/models/car";
 import type { Winner } from "../common/models/winner";
 
-const props = defineProps<{ winner: Winner; car: Car | undefined }>();
+const props = defineProps<{ winner: Winner; car?: Car }>();
 </script>
 
 <template>

@@ -15,6 +15,7 @@ garageStorage.getGarage();
 
 function getWinnerCar(id: number) {
   const car = garage.value.find((car) => car.id === id);
+
   return car;
 }
 </script>

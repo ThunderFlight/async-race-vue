@@ -4,5 +4,6 @@ export function baseUrl(path?: string) {
   if (!path) {
     return envBaseUrl;
   }
+
   return envBaseUrl + path;
 }
